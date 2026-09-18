@@ -1,8 +1,9 @@
 <?php
 // Security: allow CLI or token access
-if (php_sapi_name() !== 'cli' && (!isset($_GET['token']) || $_GET['token'] !== 'policyfit_secret_2026')) {
+if (php_sapi_name() !== 'cli' && (!isset($_GET...
     die("Access Denied.");
 }
+
 
 // 1. Setup Directories & IndexNow Key
 $rootDir = __DIR__;
