@@ -1,0 +1,45 @@
+name: cPanel UAPI Autopilot Deployment
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger cPanel Git Pull via UAPI
+        run: |
+          echo "Updating repository on cPanel..."
+          RESPONSE=$(curl -s -k -H "Authorization: cpanel ${{ secrets.CPANEL_USER }}:${{ secrets.CPANEL_TOKEN }}" \
+            "https://${{ secrets.CPANEL_HOST }}:2083/execute/VersionControl/update?repository_root=/home2/policyft/repositories/policy-fit&branch=main")
+          echo "$RESPONSE"
+          if echo "$RESPONSE" | grep -q '"status":0'; then
+            echo "Git update failed on cPanel!"
+            exit 1
+          fi
+
+      - name: Trigger cPanel Deployment via UAPI
+        run: |
+          echo "Deploying to public_html..."
+          DEPLOY_RESPONSE=$(curl -s -k -H "Authorization: cpanel ${{ secrets.CPANEL_USER }}:${{ secrets.CPANEL_TOKEN }}" \
+            "https://${{ secrets.CPANEL_HOST }}:2083/execute/VersionControlDeployment/create?repository_root=/home2/policyft/repositories/policy-fit")
+          echo "$DEPLOY_RESPONSE"
+          if echo "$DEPLOY_RESPONSE" | grep -q '"status":0'; then
+            echo "Deployment failed on cPanel!"
+            exit 1
+          fi
+
+      - name: Live Smoke Test
+        run: |
+          echo "Checking HTTP status..."
+          STATUS=$(curl -o /dev/null -s -w "%{http_code}\n" https://policy.fit/)
+          echo "HTTP Code: $STATUS"
+          if [ "$STATUS" -ne 200 ]; then
+            echo "Production verification failed!"
+            exit 1
+          fi
+          echo "SUCCESS: policy.fit is live and healthy."
+          
