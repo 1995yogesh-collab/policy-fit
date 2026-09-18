@@ -1,0 +1,35 @@
+name: Daily Autonomous AI Developer
+
+on:
+  schedule:
+    - cron: '0 8 * * *' # Rozana subah 8 AM (UTC) chalega
+  workflow_dispatch: # Manual run button
+
+permissions:
+  contents: write
+
+jobs:
+  ai-agent:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Run AI Agent
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: node ai-agent.js
+
+      - name: Commit and Push AI Changes
+        run: |
+          git config --global user.name "Gemini AI Agent"
+          git config --global user.email "ai@policy.fit"
+          git add .
+          git commit -m "🤖 Daily AI Update: Content & Code Upgrades" || echo "No changes to commit"
+          git push origin main
+          
