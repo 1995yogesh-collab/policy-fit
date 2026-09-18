@@ -1,0 +1,12 @@
+{
+  "domain": "policy.fit",
+  "roadmap": "24-part",
+  "current_work_unit": "P03-W03",
+  "last_verified_complete": "P03-W02",
+  "status": "IN-PROGRESS",
+  "last_good_commit": "HEAD",
+  "last_deployed_commit": "",
+  "last_tested_at": "",
+  "blocker": "",
+  "next_action": "Deploy Contextual Affiliate Disclosure UX"
+}
