@@ -1,0 +1,31 @@
+# 1. Block Sensitive Files from Crawlers
+<FilesMatch "\.(sql|zip|log|txt|md|json)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+<Files "ads.txt">
+    Allow from all
+</Files>
+<Files "manifest.json">
+    Allow from all
+</Files>
+
+# 2. Force HTTPS
+RewriteEngine On
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# 3. High-Speed Browser Caching for US Traffic
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType text/html "access plus 1 hour"
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
+    ExpiresByType image/webp "access plus 1 year"
+</IfModule>
+
+# 4. Clean URL Routing for US Guides
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^us/([a-zA-Z0-9_-]+)/?$ us/$1.html [L]
